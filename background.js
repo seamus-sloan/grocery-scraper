@@ -55,31 +55,39 @@ const updateSearchResults = () => {
 };
 
 /**
- * Checks if all stores have reported results and updates storage if so
+ * Checks if all enabled stores have reported results and updates storage if so
  */
 const checkSearchCompletion = () => {
-  const expectedStores = Object.keys(STORES);
-  const completedStores = Object.keys(searchResults);
+  // Get the enabled stores from the current search settings
+  chrome.storage.local.get(['storeSettings'], (result) => {
+    const settings = result.storeSettings || {};
+    const enabledStores = Object.keys(STORES).filter(storeKey => {
+      const storeSettings = settings[storeKey];
+      return storeSettings && storeSettings.enabled;
+    });
+    
+    const completedStores = Object.keys(searchResults);
 
-  console.log('[Background] Checking completion. Expected:', expectedStores, 'Completed:', completedStores);
-  console.log('[Background] Current searchResults:', searchResults);
+    console.log('[Background] Checking completion. Enabled stores:', enabledStores, 'Completed:', completedStores);
+    console.log('[Background] Current searchResults:', searchResults);
 
-  // Check if we have results from all expected stores
-  const allStoresComplete = expectedStores.every(store => completedStores.includes(store));
+    // Check if we have results from all enabled stores
+    const allEnabledStoresComplete = enabledStores.every(store => completedStores.includes(store));
 
-  if (allStoresComplete) {
-    console.log('[Background] All stores completed, storing final results');
-    updateSearchResults();
+    if (allEnabledStoresComplete && enabledStores.length > 0) {
+      console.log('[Background] All enabled stores completed, storing final results');
+      updateSearchResults();
 
-    // Clear the timeout since we're done
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-      searchTimeout = null;
+      // Clear the timeout since we're done
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+        searchTimeout = null;
+      }
+    } else {
+      const missingStores = enabledStores.filter(store => !completedStores.includes(store));
+      console.log('[Background] Still waiting for enabled stores:', missingStores);
     }
-  } else {
-    const missingStores = expectedStores.filter(store => !completedStores.includes(store));
-    console.log('[Background] Still waiting for stores:', missingStores);
-  }
+  });
 };
 
 
