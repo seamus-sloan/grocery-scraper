@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Grocery Price Comparator",
+  "version": "1.0",
+  "description": "Search multiple grocery sites and compare prices.",
+  "permissions": ["scripting", "tabs", "storage"],
+  "host_permissions": [
+    "https://www.kroger.com/*",
+    "https://www.meijer.com/*",
+    "https://www.aldi.com/*",
+    "https://www.walmart.com/*",
+    "https://www.costco.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {}
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.kroger.com/search*"],
+      "js": ["scraping/krogerContent.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://www.meijer.com/shopping/search*"],
+      "js": ["scraping/meijerContent.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://www.aldi.us/results*"],
+      "js": ["scraping/aldiContent.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://www.walmart.com/search*"],
+      "js": ["scraping/walmartContent.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://www.costco.com/s*", "https://www.costco.com/no-search-results-grocery.html"],
+      "js": ["scraping/costcoContent.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
