@@ -1,18 +1,108 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+  <meta charset="UTF-8">
   <title>Grocery Price Comparator</title>
-  <style>
-    body { font-family: Arial, sans-serif; width: 300px; margin: 10px; }
-    #results { margin-top: 15px; }
-    .result { margin-bottom: 10px; }
-  </style>
+  <link rel="stylesheet" href="styles/global.css">
+  <link rel="stylesheet" href="styles/popup.css">
 </head>
+
 <body>
-  <h3>Grocery Price Comparator</h3>
-  <input type="text" id="searchTerm" placeholder="Search for..." />
-  <button id="searchBtn">Search</button>
-  <div id="results"></div>
-  <script src="popup.js"></script>
+  <div class="container">
+    <div class="header">
+      <h1>Price Comparator</h1>
+      <p>Compare prices across multiple grocery stores</p>
+    </div>
+
+    <div class="section">
+      <div class="search-container">
+        <input type="text" id="searchTerm" class="input" placeholder="Search for groceries..." />
+        <button id="searchBtn" class="btn">Search</button>
+      </div>
+    </div>
+
+    <hr>
+    
+    <div class="section-title collapsible-header collapsed" data-target="store-settings">
+      <span>Store Settings</span>
+      <span class="collapse-icon">▼</span>
+    </div>
+
+    <div id="store-settings" class="collapsible-content collapsed">
+      <div class="card store-setting store-kroger">
+        <div class="store-header">
+          <input type="checkbox" id="enableKroger" class="store-checkbox" checked>
+          <label for="enableKroger" class="store-name">Kroger</label>
+        </div>
+        <div class="store-options">
+          <div class="sub-option">
+            <input type="checkbox" id="closeKroger" class="sub-checkbox">
+            <label for="closeKroger" class="sub-label">Close tab after search</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card store-setting store-meijer">
+        <div class="store-header">
+          <input type="checkbox" id="enableMeijer" class="store-checkbox" checked>
+          <label for="enableMeijer" class="store-name">Meijer</label>
+        </div>
+        <div class="store-options">
+          <div class="sub-option">
+            <input type="checkbox" id="closeMeijer" class="sub-checkbox">
+            <label for="closeMeijer" class="sub-label">Close tab after search</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card store-setting store-aldi">
+        <div class="store-header">
+          <input type="checkbox" id="enableAldi" class="store-checkbox" checked>
+          <label for="enableAldi" class="store-name">Aldi</label>
+        </div>
+        <div class="store-options">
+          <div class="sub-option">
+            <input type="checkbox" id="closeAldi" class="sub-checkbox">
+            <label for="closeAldi" class="sub-label">Close tab after search</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card store-setting store-walmart">
+        <div class="store-header">
+          <input type="checkbox" id="enableWalmart" class="store-checkbox" checked>
+          <label for="enableWalmart" class="store-name">Walmart</label>
+        </div>
+        <div class="store-options">
+          <div class="sub-option">
+            <input type="checkbox" id="closeWalmart" class="sub-checkbox">
+            <label for="closeWalmart" class="sub-label">Close tab after search</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card store-setting store-costco">
+        <div class="store-header">
+          <input type="checkbox" id="enableCostco" class="store-checkbox" checked>
+          <label for="enableCostco" class="store-name">Costco</label>
+        </div>
+        <div class="store-options">
+          <div class="sub-option">
+            <input type="checkbox" id="closeCostco" class="sub-checkbox">
+            <label for="closeCostco" class="sub-label">Close tab after search</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="footer">
+      Press Enter to search - Settings saved automatically
+    </div>
+
+    <script src="popup.js"></script>
 </body>
+
 </html>
