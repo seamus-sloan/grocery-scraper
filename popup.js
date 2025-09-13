@@ -3,8 +3,16 @@ const performSearch = async () => {
   const term = document.getElementById('searchTerm').value.trim();
   if (!term) return;
   
-  // Send search message to background script which will handle opening the results tab
-  chrome.runtime.sendMessage({ action: 'search', term });
+  // Get current settings
+  const result = await chrome.storage.sync.get('storeSettings');
+  const settings = result.storeSettings || defaultSettings;
+  
+  // Send search message to background script with settings
+  chrome.runtime.sendMessage({ 
+    action: 'search', 
+    term,
+    settings 
+  });
   
   // Close the popup
   window.close();
@@ -21,9 +29,11 @@ document.getElementById('searchTerm').addEventListener('keypress', (e) => {
 });
 
 // Focus on search input when popup opens
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('searchTerm').focus();
   initializeCollapsibleSections();
+  await loadSettings();
+  initializeSettings();
 });
 
 // Collapsible sections functionality
@@ -56,17 +66,76 @@ const toggleCollapse = (header, content) => {
   }
 };
 
-// Store settings handling (placeholder for future implementation)
-const storeCheckboxes = document.querySelectorAll('.store-checkbox');
-const closeCheckboxes = document.querySelectorAll('.sub-checkbox');
+// Default settings for all stores
+const defaultSettings = {
+  kroger: { enabled: true, closeTab: true },
+  meijer: { enabled: true, closeTab: true },
+  aldi: { enabled: true, closeTab: true },
+  walmart: { enabled: true, closeTab: true },
+  costco: { enabled: true, closeTab: true }
+};
 
-// Add change listeners to all checkboxes (for future settings functionality)
-[...storeCheckboxes, ...closeCheckboxes].forEach(checkbox => {
-  checkbox.addEventListener('change', () => {
-    // TODO: Save settings to chrome.storage
-    console.log('Settings changed - implementation coming soon');
+// Load settings from storage
+const loadSettings = async () => {
+  try {
+    const result = await chrome.storage.sync.get('storeSettings');
+    const settings = result.storeSettings || defaultSettings;
+    
+    // Update checkboxes based on loaded settings
+    Object.keys(settings).forEach(store => {
+      const enableCheckbox = document.getElementById(`enable${capitalizeFirst(store)}`);
+      const closeCheckbox = document.getElementById(`close${capitalizeFirst(store)}`);
+      
+      if (enableCheckbox) {
+        enableCheckbox.checked = settings[store].enabled;
+      }
+      if (closeCheckbox) {
+        closeCheckbox.checked = settings[store].closeTab;
+      }
+    });
+  } catch (error) {
+    console.error('Error loading settings:', error);
+  }
+};
+
+// Save settings to storage
+const saveSettings = async () => {
+  try {
+    const settings = {};
+    
+    // Get current checkbox states
+    Object.keys(defaultSettings).forEach(store => {
+      const enableCheckbox = document.getElementById(`enable${capitalizeFirst(store)}`);
+      const closeCheckbox = document.getElementById(`close${capitalizeFirst(store)}`);
+      
+      settings[store] = {
+        enabled: enableCheckbox ? enableCheckbox.checked : defaultSettings[store].enabled,
+        closeTab: closeCheckbox ? closeCheckbox.checked : defaultSettings[store].closeTab
+      };
+    });
+    
+    await chrome.storage.sync.set({ storeSettings: settings });
+    console.log('Settings saved:', settings);
+  } catch (error) {
+    console.error('Error saving settings:', error);
+  }
+};
+
+// Helper function to capitalize first letter
+const capitalizeFirst = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+// Store settings handling
+const initializeSettings = () => {
+  const storeCheckboxes = document.querySelectorAll('.store-checkbox');
+  const closeCheckboxes = document.querySelectorAll('.sub-checkbox');
+
+  // Add change listeners to all checkboxes
+  [...storeCheckboxes, ...closeCheckboxes].forEach(checkbox => {
+    checkbox.addEventListener('change', saveSettings);
   });
-});
+};
 
 // Add visual feedback for interactions
 document.getElementById('searchBtn').addEventListener('mousedown', (e) => {

@@ -4,17 +4,20 @@ const STORES = {
   kroger: {
     name: 'Kroger',
     buildUrl: (term) => `https://www.kroger.com/search?query=${encodeURIComponent(term)}`,
-    tabId: null
+    tabId: null,
+    shouldClose: true
   },
   meijer: {
     name: 'Meijer', 
     buildUrl: (term) => `https://www.meijer.com/shopping/search.html?text=${encodeURIComponent(term)}`,
-    tabId: null
+    tabId: null,
+    shouldClose: true
   },
   aldi: {
     name: 'Aldi',
     buildUrl: (term) => `https://www.aldi.us/results?q=${encodeURIComponent(term)}`,
-    tabId: null
+    tabId: null,
+    shouldClose: true
   },
   walmart: {
     name: 'Walmart',
@@ -22,7 +25,8 @@ const STORES = {
       const filter = `exclude_oos:Show+available+items+only||fulfillment_method_in_store:In-store`;
       return `https://www.walmart.com/search?q=${encodeURIComponent(term)}&${encodeURIComponent(filter)}`;
     },
-    tabId: null
+    tabId: null,
+    shouldClose: true
   },
   costco: {
     name: 'Costco',
@@ -30,7 +34,8 @@ const STORES = {
       const filter = `refine=item_program_eligibility-InWarehouse`;
       return `https://www.costco.com/s?keyword=${encodeURIComponent(term)}&${encodeURIComponent(filter)}`;
     },
-    tabId: null
+    tabId: null,
+    shouldClose: true
   }
 };
 
@@ -82,15 +87,18 @@ const checkSearchCompletion = () => {
  * Creates a new tab for a specific store's search results.
  * @param storeKey 
  * @param term 
+ * @param closeTab
  */
-const createStoreTab = (storeKey, term) => {
+const createStoreTab = (storeKey, term, closeTab = true) => {
   const store = STORES[storeKey];
   const url = store.buildUrl(term);
   
   console.log(`Creating a tab for ${store.name}:`, url);
+  console.log(`Close tab after search: ${closeTab}`);
   
   chrome.tabs.create({ url, active: false }, (tab) => {
     STORES[storeKey].tabId = tab.id;
+    STORES[storeKey].shouldClose = closeTab;
     console.log(`[Background] Created ${store.name} tab with ID:`, tab.id);
   });
 };
@@ -111,10 +119,14 @@ const handleStoreResults = (storeKey, results) => {
     items: results.length ? results : [{ name: 'No results found', price: '' }]
   };
 
-  // Close the scraping tab if it exists
-  if (store.tabId) {
+  // Close the scraping tab if it exists and shouldClose is true
+  if (store.tabId && store.shouldClose) {
+    console.log(`[Background] Closing ${store.name} tab (ID: ${store.tabId}) as per settings`);
     chrome.tabs.remove(store.tabId);
     STORES[storeKey].tabId = null;
+  } else if (store.tabId && !store.shouldClose) {
+    console.log(`[Background] Keeping ${store.name} tab open (ID: ${store.tabId}) as per settings`);
+    STORES[storeKey].tabId = null; // Clear reference but don't close tab
   }
 };
 
@@ -122,11 +134,12 @@ const handleStoreResults = (storeKey, results) => {
  * Initializes the search process for the given term by creating tabs for each store and opening results page.
  * @param term 
  */
-const initializeSearch = (term) => {
+const initializeSearch = (term, settings = {}) => {
   // Clear previous results and reset tab IDs
   searchResults = {};
   Object.keys(STORES).forEach(storeKey => {
     STORES[storeKey].tabId = null;
+    STORES[storeKey].shouldClose = true; // Reset to default
   });
   
   if (searchTimeout) {
@@ -134,9 +147,14 @@ const initializeSearch = (term) => {
   }
 
   // Set current search term and clear previous results
-  chrome.storage.local.set({ currentSearchTerm: term, searchResults: null }, () => {
+  chrome.storage.local.set({ 
+    currentSearchTerm: term, 
+    searchResults: null,
+    storeSettings: settings 
+  }, () => {
     console.log(`[Background] currentSearchTerm: ${term}`);
     console.log(`[Background] searchResults: null`);
+    console.log(`[Background] storeSettings:`, settings);
   });
 
   // Set timeout to finalize results after 15 seconds even if not all stores complete
@@ -148,9 +166,18 @@ const initializeSearch = (term) => {
     searchTimeout = null;
   }, SEARCH_TIMEOUT_MS);
 
-  // Open results page and all store search tabs
+  // Open results page
   chrome.tabs.create({ url: chrome.runtime.getURL(`results.html?term=${encodeURIComponent(term)}`) });
-  Object.keys(STORES).forEach(storeKey => createStoreTab(storeKey, term));
+  
+  // Only open tabs for enabled stores
+  Object.keys(STORES).forEach(storeKey => {
+    const storeSettings = settings[storeKey];
+    if (storeSettings && storeSettings.enabled) {
+      createStoreTab(storeKey, term, storeSettings.closeTab);
+    } else {
+      console.log(`[Background] Skipping ${storeKey} - disabled in settings`);
+    }
+  });
 };
 
 /**
@@ -160,8 +187,10 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   // The 'search' action comes from the popup to start a new search
   if (message.action === 'search') {
     const term = message.term;
+    const settings = message.settings || {};
     console.log('[Background] Starting search for:', term);
-    initializeSearch(term);
+    console.log('[Background] With settings:', settings);
+    initializeSearch(term, settings);
     return false;
   }
   
