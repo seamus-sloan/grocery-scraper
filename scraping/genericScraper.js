@@ -6,7 +6,7 @@
   // Auto-detect which store we're on based on URL
   const detectStore = () => {
     const hostname = window.location.hostname;
-    
+
     if (hostname.includes('kroger.com')) return 'kroger';
     if (hostname.includes('meijer.com')) return 'meijer';
     if (hostname.includes('aldi.us')) return 'aldi';
@@ -102,13 +102,19 @@
           }
           
           // Handle price parsing
-          if (config.fields.price === null || config.priceParser) {
-            // Use custom price parser
-            price = config.priceParser(container);
+          if (config.fields.price === null) {
+            // Use custom price parser with container (for complex stores like Meijer, Costco)
+            price = config.priceParser ? config.priceParser(container) : '';
           } else {
+            // Get the price element first, then use parser if available
             const priceElement = container.querySelector(config.fields.price);
-            price = config.priceParser ? config.priceParser(priceElement) : 
-                   (priceElement ? priceElement.textContent.trim() : '');
+            if (config.priceParser) {
+              // Use custom price parser with the price element
+              price = config.priceParser(priceElement);
+            } else {
+              // Default text extraction
+              price = priceElement ? priceElement.textContent.trim() : '';
+            }
           }
           
           // Check for discounts and sales
