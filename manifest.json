@@ -20,28 +20,15 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.kroger.com/search*"],
-      "js": ["scraping/krogerContent.js"],
-      "run_at": "document_end"
-    },
-    {
-      "matches": ["https://www.meijer.com/shopping/search*"],
-      "js": ["scraping/meijerContent.js"],
-      "run_at": "document_end"
-    },
-    {
-      "matches": ["https://www.aldi.us/results*"],
-      "js": ["scraping/aldiContent.js"],
-      "run_at": "document_end"
-    },
-    {
-      "matches": ["https://www.walmart.com/search*"],
-      "js": ["scraping/walmartContent.js"],
-      "run_at": "document_end"
-    },
-    {
-      "matches": ["https://www.costco.com/s*", "https://www.costco.com/no-search-results-grocery.html"],
-      "js": ["scraping/costcoContent.js"],
+      "matches": [
+        "https://www.kroger.com/search*",
+        "https://www.meijer.com/shopping/search*", 
+        "https://www.aldi.us/results*",
+        "https://www.walmart.com/search*",
+        "https://www.costco.com/s*",
+        "https://www.costco.com/no-search-results-grocery.html"
+      ],
+      "js": ["scraping/storeConfigs.js", "scraping/genericScraper.js"],
       "run_at": "document_end"
     }
   ]
