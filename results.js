@@ -74,7 +74,12 @@
 
       html += `
         <div class="store-column ${storeClass}">
-          <div class="store-header">${store.name}</div>
+          <div class="store-header">
+            ${store.searchUrl ? 
+              `<a href="${store.searchUrl}" target="_blank" class="store-header-link">${store.name}</a>` : 
+              store.name
+            }
+          </div>
           <div class="products-list">
             ${initialItems.map(item => `
               <div class="product-item${item.discount ? ' has-discount' : ''}">

@@ -148,7 +148,8 @@ function waitForProducts() {
         console.log('[Walmart Content] Sending results to background script');
         chrome.runtime.sendMessage({
           action: 'walmartResults',
-          results: products
+          results: products,
+          searchUrl: window.location.href
         });
       }
       
@@ -162,7 +163,8 @@ function waitForProducts() {
         resultsSent = true;
         chrome.runtime.sendMessage({
           action: 'walmartResults',
-          results: []
+          results: [],
+          searchUrl: window.location.href
         });
       }
     }

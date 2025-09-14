@@ -46,13 +46,21 @@
       if (cards.length > 0) {
         const results = scrapeAldi();
         console.log('[AldiContent] Scraped results:', results);
-        chrome.runtime.sendMessage({ action: 'aldiResults', results });
+        chrome.runtime.sendMessage({ 
+          action: 'aldiResults', 
+          results,
+          searchUrl: window.location.href
+        });
         resultsSent = true;
       } else if (++attempts < maxAttempts) {
         setTimeout(tryScrape, interval);
       } else {
         console.log('[AldiContent] No products found after waiting.');
-        chrome.runtime.sendMessage({ action: 'aldiResults', results: [] });
+        chrome.runtime.sendMessage({ 
+          action: 'aldiResults', 
+          results: [],
+          searchUrl: window.location.href
+        });
         resultsSent = true;
       }
     }

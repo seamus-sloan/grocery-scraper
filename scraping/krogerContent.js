@@ -50,13 +50,21 @@
       if (cards.length > 0) {
         const results = scrapeKroger();
         console.log('[KrogerContent] Scraped results:', results);
-        chrome.runtime.sendMessage({ action: 'krogerResults', results });
+        chrome.runtime.sendMessage({ 
+          action: 'krogerResults', 
+          results,
+          searchUrl: window.location.href
+        });
         resultsSent = true;
       } else if (++attempts < maxAttempts) {
         setTimeout(tryScrape, interval);
       } else {
         console.log('[KrogerContent] No products found after waiting.');
-        chrome.runtime.sendMessage({ action: 'krogerResults', results: [] });
+        chrome.runtime.sendMessage({ 
+          action: 'krogerResults', 
+          results: [],
+          searchUrl: window.location.href
+        });
         resultsSent = true;
       }
     }

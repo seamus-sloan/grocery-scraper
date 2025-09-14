@@ -77,7 +77,11 @@
 
             if (cards.length > 0) {
                 const results = scrapeMeijer();
-                chrome.runtime.sendMessage({ action: 'meijerResults', results });
+                chrome.runtime.sendMessage({ 
+                  action: 'meijerResults', 
+                  results,
+                  searchUrl: window.location.href
+                });
                 resultsSent = true;
             } else if (attempts < maxAttempts) {
 
@@ -86,7 +90,11 @@
 
                 setTimeout(tryScrape, interval);
             } else {
-                chrome.runtime.sendMessage({ action: 'meijerResults', results: [] });
+                chrome.runtime.sendMessage({ 
+                  action: 'meijerResults', 
+                  results: [],
+                  searchUrl: window.location.href
+                });
                 resultsSent = true;
             }
         }

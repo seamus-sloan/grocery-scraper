@@ -91,7 +91,8 @@ function waitForProducts() {
       resultsSent = true;
       chrome.runtime.sendMessage({
         action: 'costcoResults',
-        results: []
+        results: [],
+        searchUrl: window.location.href
       });
     }
     return;
@@ -111,7 +112,8 @@ function waitForProducts() {
         resultsSent = true;
         chrome.runtime.sendMessage({
           action: 'costcoResults',
-          results: []
+          results: [],
+          searchUrl: window.location.href
         });
       }
       return;
@@ -128,7 +130,8 @@ function waitForProducts() {
         console.log('[Costco Content] Sending results to background script');
         chrome.runtime.sendMessage({
           action: 'costcoResults',
-          results: products
+          results: products,
+          searchUrl: window.location.href
         });
       }
       
@@ -142,7 +145,8 @@ function waitForProducts() {
         resultsSent = true;
         chrome.runtime.sendMessage({
           action: 'costcoResults',
-          results: []
+          results: [],
+          searchUrl: window.location.href
         });
       }
     }

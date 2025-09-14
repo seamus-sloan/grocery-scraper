@@ -116,15 +116,17 @@ const createStoreTab = (storeKey, term, closeTab = true) => {
  * Handles behavior when results are received from the provided store.
  * @param storeKey 
  * @param results 
+ * @param searchUrl
  */
-const handleStoreResults = (storeKey, results) => {
+const handleStoreResults = (storeKey, results, searchUrl) => {
   const store = STORES[storeKey];
   console.log(`[Background] Received ${storeKey} results:`, results);
 
   // Store results
   searchResults[storeKey] = {
     name: store.name,
-    items: results.length ? results : [{ name: 'No results found', price: '' }]
+    items: results.length ? results : [{ name: 'No results found', price: '' }],
+    searchUrl: searchUrl
   };
 
   // Close the scraping tab if it exists and shouldClose is true
@@ -205,7 +207,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   // Search result messages will have actions like 'krogerResults', 'meijerResults', etc.
   const storeKey = message.action.replace('Results', '');
   if (STORES[storeKey]) {
-    handleStoreResults(storeKey, message.results);
+    handleStoreResults(storeKey, message.results, message.searchUrl);
     checkSearchCompletion();
   }
 });
