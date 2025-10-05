@@ -143,8 +143,71 @@
     });
   }
 
+  function handleNewSearch() {
+    const searchInput = document.getElementById('newSearchTerm');
+    const searchBtn = document.getElementById('newSearchBtn');
+    const searchTerm = searchInput.value.trim();
+    
+    if (!searchTerm) {
+      searchInput.focus();
+      return;
+    }
+    
+    // Disable button and show loading state
+    searchBtn.disabled = true;
+    searchBtn.textContent = 'Searching...';
+    searchInput.disabled = true;
+    
+    // Get current store settings from storage and start new search
+    chrome.storage.local.get(['storeSettings'], (result) => {
+      const settings = result.storeSettings || {};
+      
+      // Send search message to background script
+      chrome.runtime.sendMessage({
+        action: 'search',
+        term: searchTerm,
+        settings: settings
+      });
+      
+      // Update URL and reload page with new search term
+      const newUrl = `${window.location.pathname}?term=${encodeURIComponent(searchTerm)}`;
+      window.location.href = newUrl;
+    });
+  }
+
+  function initializeNewSearch() {
+    const searchInput = document.getElementById('newSearchTerm');
+    const searchBtn = document.getElementById('newSearchBtn');
+    
+    if (!searchInput || !searchBtn) return;
+    
+    // Handle button click
+    searchBtn.addEventListener('click', handleNewSearch);
+    
+    // Handle Enter key in input
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleNewSearch();
+      }
+    });
+    
+    // Handle input events for better UX
+    searchInput.addEventListener('input', (e) => {
+      const hasValue = e.target.value.trim().length > 0;
+      searchBtn.disabled = !hasValue;
+    });
+    
+    // Initialize button state
+    searchBtn.disabled = true;
+  }
+
   // Initialize
   const { term } = getUrlParams();
   document.getElementById('searchTerm').textContent = `Searching for "${term}"...`;
+  
+  // Initialize new search functionality
+  initializeNewSearch();
+  
   pollForResults();
 })();
