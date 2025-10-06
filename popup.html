@@ -4,101 +4,100 @@
 <head>
   <meta charset="UTF-8">
   <title>Kelsey's Grocery Planner</title>
-  <link rel="stylesheet" href="styles/global.css">
-  <link rel="stylesheet" href="styles/popup.css">
+  <link rel="stylesheet" href="styles/tailwind.css">
 </head>
 
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Kelsey's Grocery Planner</h1>
-      <p>Compare prices across multiple grocery stores</p>
+<body class="font-sans text-gray-800">
+  <div class="bg-white rounded-2xl p-6 shadow-lg max-w-md">
+    <div class="text-center mb-6">
+      <h1 class="text-2xl font-bold bg-gradient-to-br from-indigo-600 to-indigo-800 bg-clip-text text-transparent mb-2">Kelsey's Grocery Planner</h1>
+      <p class="text-gray-600 text-sm">Compare prices across multiple grocery stores</p>
     </div>
 
-    <div class="section">
-      <div class="search-container">
-        <input type="text" id="searchTerm" class="input" placeholder="Search for groceries..." />
-        <button id="searchBtn" class="btn">Search</button>
+    <div class="mb-6">
+      <div class="flex gap-3">
+        <input type="text" id="searchTerm" class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-base transition-all duration-300 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500 focus:ring-opacity-20" placeholder="Search for groceries..." />
+        <button id="searchBtn" class="px-5 py-3 bg-gradient-to-br from-indigo-600 to-indigo-800 text-white border-0 rounded-xl font-semibold cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0">Search</button>
       </div>
     </div>
 
-    <hr>
+    <hr class="border-0 border-t border-gray-300 my-5">
     
-    <div class="section-title collapsible-header collapsed" data-target="store-settings">
-      <span>Store Settings</span>
-      <span class="collapse-icon">▼</span>
+    <div class="cursor-pointer flex justify-between items-center select-none transition-all duration-300 hover:text-amber-500 mb-3 collapsible-header collapsed" data-target="store-settings">
+      <span class="text-lg font-semibold text-gray-800">Store Settings</span>
+      <span class="text-xs transition-transform duration-300 text-gray-400 collapse-icon">▼</span>
     </div>
 
-    <div id="store-settings" class="collapsible-content collapsed">
-      <div class="card store-setting store-kroger">
-        <div class="store-header">
-          <input type="checkbox" id="enableKroger" class="store-checkbox" checked>
-          <label for="enableKroger" class="store-name">Kroger</label>
+    <div id="store-settings" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 pt-0 pb-0 collapsible-content collapsed">
+      <div class="mb-3 p-3 bg-gray-50 rounded-xl border border-gray-200 store-kroger">
+        <div class="flex items-center gap-3 mb-2">
+          <input type="checkbox" id="enableKroger" class="w-5 h-5 appearance-none bg-white border-2 border-gray-300 rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-indigo-600 checked:to-indigo-800 checked:border-amber-500 relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block store-checkbox" checked>
+          <label for="enableKroger" class="font-medium cursor-pointer">Kroger</label>
         </div>
-        <div class="store-options">
-          <div class="sub-option">
-            <input type="checkbox" id="closeKroger" class="sub-checkbox">
-            <label for="closeKroger" class="sub-label">Close tab after search</label>
+        <div class="ml-8">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="closeKroger" class="w-4 h-4 appearance-none bg-white border-2 border-gray-300 rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-indigo-600 checked:to-indigo-800 checked:border-amber-500 relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block sub-checkbox">
+            <label for="closeKroger" class="text-sm text-gray-600 cursor-pointer">Close tab after search</label>
           </div>
         </div>
       </div>
 
-      <div class="card store-setting store-meijer">
-        <div class="store-header">
-          <input type="checkbox" id="enableMeijer" class="store-checkbox" checked>
-          <label for="enableMeijer" class="store-name">Meijer</label>
+      <div class="mb-3 p-3 bg-gray-50 rounded-xl border border-gray-200 store-meijer">
+        <div class="flex items-center gap-3 mb-2">
+          <input type="checkbox" id="enableMeijer" class="w-5 h-5 appearance-none bg-white border-2 border-gray-200 rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-indigo-600 checked:to-indigo-800 checked:border-amber-500 relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block store-checkbox" checked>
+          <label for="enableMeijer" class="font-medium cursor-pointer">Meijer</label>
         </div>
-        <div class="store-options">
-          <div class="sub-option">
-            <input type="checkbox" id="closeMeijer" class="sub-checkbox">
-            <label for="closeMeijer" class="sub-label">Close tab after search</label>
+        <div class="ml-8">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="closeMeijer" class="w-4 h-4 appearance-none bg-white border-2 border-gray-200 rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-indigo-600 checked:to-indigo-800 checked:border-amber-500 relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block sub-checkbox">
+            <label for="closeMeijer" class="text-sm text-gray-600 cursor-pointer">Close tab after search</label>
           </div>
         </div>
       </div>
 
-      <div class="card store-setting store-aldi">
-        <div class="store-header">
-          <input type="checkbox" id="enableAldi" class="store-checkbox" checked>
-          <label for="enableAldi" class="store-name">Aldi</label>
+      <div class="mb-3 p-3 bg-gray-50 rounded-xl border border-gray-200 store-aldi">
+        <div class="flex items-center gap-3 mb-2">
+          <input type="checkbox" id="enableAldi" class="w-5 h-5 appearance-none bg-white border-2 border-gray-200 rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-indigo-600 checked:to-indigo-800 checked:border-amber-500 relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block store-checkbox" checked>
+          <label for="enableAldi" class="font-medium cursor-pointer">Aldi</label>
         </div>
-        <div class="store-options">
-          <div class="sub-option">
-            <input type="checkbox" id="closeAldi" class="sub-checkbox">
-            <label for="closeAldi" class="sub-label">Close tab after search</label>
+        <div class="ml-8">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="closeAldi" class="w-4 h-4 appearance-none bg-white border-2 border-gray-200 rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-indigo-600 checked:to-indigo-800 checked:border-amber-500 relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block sub-checkbox">
+            <label for="closeAldi" class="text-sm text-gray-600 cursor-pointer">Close tab after search</label>
           </div>
         </div>
       </div>
 
-      <div class="card store-setting store-walmart">
-        <div class="store-header">
-          <input type="checkbox" id="enableWalmart" class="store-checkbox" checked>
-          <label for="enableWalmart" class="store-name">Walmart</label>
+      <div class="mb-3 p-3 bg-gray-50 rounded-xl border border-gray-200 store-walmart">
+        <div class="flex items-center gap-3 mb-2">
+          <input type="checkbox" id="enableWalmart" class="w-5 h-5 appearance-none bg-white border-2 border-gray-200 rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-indigo-600 checked:to-indigo-800 checked:border-amber-500 relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block store-checkbox" checked>
+          <label for="enableWalmart" class="font-medium cursor-pointer">Walmart</label>
         </div>
-        <div class="store-options">
-          <div class="sub-option">
-            <input type="checkbox" id="closeWalmart" class="sub-checkbox">
-            <label for="closeWalmart" class="sub-label">Close tab after search</label>
+        <div class="ml-8">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="closeWalmart" class="w-4 h-4 appearance-none bg-white border-2 border-gray-200 rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-indigo-600 checked:to-indigo-800 checked:border-amber-500 relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block sub-checkbox">
+            <label for="closeWalmart" class="text-sm text-gray-600 cursor-pointer">Close tab after search</label>
           </div>
         </div>
       </div>
 
-      <div class="card store-setting store-costco">
-        <div class="store-header">
-          <input type="checkbox" id="enableCostco" class="store-checkbox" checked>
-          <label for="enableCostco" class="store-name">Costco</label>
+      <div class="mb-3 p-3 bg-gray-50 rounded-xl border border-gray-200 store-costco">
+        <div class="flex items-center gap-3 mb-2">
+          <input type="checkbox" id="enableCostco" class="w-5 h-5 appearance-none bg-white border-2 border-gray-200 rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-indigo-600 checked:to-indigo-800 checked:border-amber-500 relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block store-checkbox" checked>
+          <label for="enableCostco" class="font-medium cursor-pointer">Costco</label>
         </div>
-        <div class="store-options">
-          <div class="sub-option">
-            <input type="checkbox" id="closeCostco" class="sub-checkbox">
-            <label for="closeCostco" class="sub-label">Close tab after search</label>
+        <div class="ml-8">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="closeCostco" class="w-4 h-4 appearance-none bg-white border-2 border-gray-200 rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-indigo-600 checked:to-indigo-800 checked:border-amber-500 relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block sub-checkbox">
+            <label for="closeCostco" class="text-sm text-gray-600 cursor-pointer">Close tab after search</label>
           </div>
         </div>
       </div>
     </div>
 
-    <hr>
+    <hr class="border-0 border-t border-gray-200 my-5">
 
-    <div class="footer">
+    <div class="text-center text-xs text-gray-400">
       Press Enter to search - Settings saved automatically
     </div>
 

@@ -5,13 +5,13 @@
   // Fixed store order
   const STORE_ORDER = ['Kroger', 'Meijer', 'Aldi', 'Walmart', 'Costco'];
   
-  // Store name to CSS class mapping
-  const STORE_CLASSES: Record<string, string> = {
-    'Kroger': 'store-kroger',
-    'Meijer': 'store-meijer', 
-    'Aldi': 'store-aldi',
-    'Walmart': 'store-walmart',
-    'Costco': 'store-costco'
+  // Store name to gradient class mapping for headers
+  const STORE_HEADER_GRADIENTS: Record<string, string> = {
+    'Kroger': 'bg-gradient-to-r from-blue-700 to-blue-600',
+    'Meijer': 'bg-gradient-to-r from-red-600 to-red-500', 
+    'Aldi': 'bg-gradient-to-r from-sky-400 to-sky-300',
+    'Walmart': 'bg-gradient-to-r from-blue-600 to-blue-500',
+    'Costco': 'bg-gradient-to-r from-red-600 to-red-500'
   };
 
   interface UrlParams {
@@ -39,7 +39,7 @@
   }
 
   function toggleMoreResults(button: HTMLButtonElement): void {
-    const storeColumn = button.closest('.store-column');
+    const storeColumn = button.closest('.bg-white');
     if (!storeColumn) return;
     
     const hiddenItems = storeColumn.querySelectorAll('.hidden-item');
@@ -70,54 +70,64 @@
     if (!resultsContainer) return;
     
     if (!results || results.length === 0) {
-      resultsContainer.innerHTML = '<div class="loading">No results found.</div>';
+      resultsContainer.innerHTML = '<div class="text-center text-gray-600">No results found.</div>';
       return;
     }
 
     // Sort stores in fixed order
     const sortedResults = sortStoresByOrder(results);
     
-    let html = '<div class="stores-container">';
+    let html = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">';
     
     sortedResults.forEach(store => {
       const items = store.products;
       const initialItems = items.slice(0, 15); // Show first 15 items
       const hiddenItems = items.slice(15); // Rest of the items
-      const storeClass = STORE_CLASSES[store.name] || '';
+      const headerGradient = STORE_HEADER_GRADIENTS[store.name] || 'bg-gradient-to-r from-gray-600 to-gray-500';
 
       html += `
-        <div class="store-column ${storeClass}">
-          <div class="store-header">
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
+          <div class="px-5 py-4 ${headerGradient} text-white">
             ${store.searchUrl ? 
-              `<a href="${store.searchUrl}" target="_blank" class="store-header-link">${store.name}</a>` : 
-              store.name
+              `<a href="${store.searchUrl}" target="_blank" class="text-lg font-semibold text-white hover:text-gray-100 hover:underline transition-colors block text-center">${store.name}</a>` : 
+              `<h3 class="text-lg font-semibold text-center">${store.name}</h3>`
             }
           </div>
-          <div class="products-list">
+          <div class="flex-1 overflow-y-auto max-h-96">
             ${initialItems.map(item => `
-              <div class="product-item${item.discount ? ' has-discount' : ''}">
-                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="product-image">` : ''}
-                <div class="product-details">
-                  <div class="product-name">${item.name}</div>
-                  <div class="product-price">${item.price}</div>
-                  ${item.sale ? `<div class="sale-info" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
+              <div class="border border-gray-200 rounded-xl p-3 mb-3 bg-white transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-amber-500 flex gap-3 items-start min-h-[80px] relative${item.discount ? ' shadow-md' : ''}">
+                ${item.discount ? `
+                  <div class="absolute left-0 top-0 bottom-0 w-5 bg-gradient-to-b from-red-500 to-red-600 text-white text-xs font-bold flex items-center justify-center rounded-l-xl">
+                    <span class="writing-mode-vertical text-center transform rotate-180" style="writing-mode: vertical-lr; text-orientation: mixed;">PRICE CUT</span>
+                  </div>
+                ` : ''}
+                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-15 h-15 object-contain rounded-lg bg-white border border-gray-200 flex-shrink-0${item.discount ? ' ml-2' : ''}">` : ''}
+                <div class="flex-1 min-w-0 flex flex-col gap-1.5">
+                  <div class="text-sm font-semibold text-gray-800 leading-tight line-clamp-2">${item.name}</div>
+                  <div class="text-lg font-bold text-amber-600">${item.price}</div>
+                  ${item.sale ? `<div class="text-xs bg-gradient-to-r from-indigo-100 to-green-100 text-gray-800 px-2 py-1 rounded text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
                 </div>
               </div>
             `).join('')}
             ${hiddenItems.map(item => `
-              <div class="product-item hidden-item${item.discount ? ' has-discount' : ''}" hidden>
-                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="product-image">` : ''}
-                <div class="product-details">
-                  <div class="product-name">${item.name}</div>
-                  <div class="product-price">${item.price}</div>
-                  ${item.sale ? `<div class="sale-info" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
+              <div class="border border-gray-200 rounded-xl p-3 mb-3 bg-white transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-amber-500 flex gap-3 items-start min-h-[80px] relative hidden-item${item.discount ? ' shadow-md' : ''}" hidden>
+                ${item.discount ? `
+                  <div class="absolute left-0 top-0 bottom-0 w-5 bg-gradient-to-b from-red-500 to-red-600 text-white text-xs font-bold flex items-center justify-center rounded-l-xl">
+                    <span class="writing-mode-vertical text-center transform rotate-180" style="writing-mode: vertical-lr; text-orientation: mixed;">PRICE CUT</span>
+                  </div>
+                ` : ''}
+                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-15 h-15 object-contain rounded-lg bg-white border border-gray-200 flex-shrink-0${item.discount ? ' ml-2' : ''}">` : ''}
+                <div class="flex-1 min-w-0 flex flex-col gap-1.5">
+                  <div class="text-sm font-semibold text-gray-800 leading-tight line-clamp-2">${item.name}</div>
+                  <div class="text-lg font-bold text-amber-600">${item.price}</div>
+                  ${item.sale ? `<div class="text-xs bg-gradient-to-r from-indigo-100 to-green-100 text-gray-800 px-2 py-1 rounded text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
                 </div>
               </div>
             `).join('')}
           </div>
           ${hiddenItems.length > 0 ? `
-            <div class="show-more-section">
-              <button class="show-more-btn" data-hidden-count="${hiddenItems.length}">
+            <div class="p-4 border-t border-gray-200 bg-gray-50">
+              <button class="w-full px-4 py-2 bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 show-more-btn" data-hidden-count="${hiddenItems.length}">
                 Show ${hiddenItems.length} more
               </button>
             </div>
@@ -139,7 +149,7 @@
     });
     
     // Add error handling for product images
-    const productImages = resultsContainer.querySelectorAll('.product-image');
+    const productImages = resultsContainer.querySelectorAll('img');
     productImages.forEach(img => {
       const imageElement = img as HTMLImageElement;
       imageElement.addEventListener('error', function() {

@@ -4,14 +4,19 @@
   "description": "Chrome extension for comparing grocery prices across multiple stores",
   "scripts": {
     "build": "tsc",
+    "build:css": "vite build --config vite-css.config.js",
+    "build:css:watch": "vite build --config vite-css.config.js --watch",
     "watch": "tsc --watch",
     "clean": "rm -rf dist",
-    "dev": "npm run clean && npm run build && npm run watch",
-    "prepare-extension": "npm run clean && npm run build && npm run copy-assets",
-    "copy-assets": "cp manifest.json dist/ && cp *.html dist/ && cp -r styles dist/ && cp -r scraping/itemExamples dist/scraping/ 2>/dev/null || true"
+    "dev": "npm run clean && npm run build && npm run build:css && npm run watch",
+    "prepare-extension": "npm run clean && npm run build && npm run copy-assets && npm run build:css && npm run cleanup-assets",
+    "copy-assets": "cp manifest.json dist/ && cp *.html dist/ && cp -r scraping/itemExamples dist/scraping/ 2>/dev/null || true",
+    "cleanup-assets": "rm -rf dist/styles/assets dist/styles/*.js 2>/dev/null || true"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.270",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
     "typescript": "^5.6.2"
   },
   "keywords": [
@@ -21,5 +26,12 @@
     "web-scraping"
   ],
   "author": "Seamus",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.14",
+    "@tailwindcss/vite": "^4.1.14",
+    "my-project": "^0.0.1",
+    "tailwindcss": "^4.1.14",
+    "vite": "^7.1.9"
+  }
 }
