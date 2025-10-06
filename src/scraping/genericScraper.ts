@@ -1,10 +1,12 @@
+/// <reference path="../shared-types.ts" />
+
 // Generic scraper engine that works with store configurations
 // Auto-detects which store it's running on and uses appropriate config
 (function() {
   'use strict';
   
   // Auto-detect which store we're on based on URL
-  const detectStore = () => {
+  const detectStore = (): StoreKey | null => {
     const hostname = window.location.hostname;
 
     if (hostname.includes('kroger.com')) return 'kroger';
@@ -18,22 +20,23 @@
   };
   
   // Helper function to safely extract text from an element
-  const extractText = (container, selector) => {
+  const extractText = (container: Element, selector: string | null): string => {
     if (!selector) return '';
     const element = container.querySelector(selector);
-    return element ? element.textContent.trim() : '';
+    return element ? element.textContent?.trim() || '' : '';
   };
 
   // Helper function to safely extract image URL
-  const extractImage = (container, selector) => {
+  const extractImage = (container: Element, selector: string | null): string => {
     if (!selector) return '';
     const element = container.querySelector(selector);
     if (!element) return '';
-    return element.src || element.srcset?.split(' ')[0] || '';
+    const img = element as HTMLImageElement;
+    return img.src || img.srcset?.split(' ')[0] || '';
   };
 
   // Helper function to check conditions
-  const checkCondition = (container, fieldConfig) => {
+  const checkCondition = (container: Element, fieldConfig: FieldConfig): boolean => {
     if (!fieldConfig || !fieldConfig.condition) return false;
     
     if (fieldConfig.selector) {
@@ -44,28 +47,15 @@
     return fieldConfig.condition(container);
   };
 
-  // Helper function to extract field values
-  const extractField = (container, fieldConfig) => {
-    if (!fieldConfig) return '';
-    
-    if (typeof fieldConfig === 'string') {
-      return extractText(container, fieldConfig);
-    }
-    
-    if (fieldConfig.selector) {
-      const element = container.querySelector(fieldConfig.selector);
-      if (fieldConfig.condition) {
-        return fieldConfig.condition(element);
-      }
-      return element ? element.textContent.trim() : '';
-    }
-    
-    return '';
-  };
+  interface Scraper {
+    scrapeProducts: () => Product[];
+    waitAndScrape: () => void;
+    sendResults: (results: Product[]) => void;
+  }
 
   // Main scraper function
-  const createScraper = (storeKey) => {
-    const config = window.STORE_CONFIGS[storeKey];
+  const createScraper = (storeKey: StoreKey): Scraper | null => {
+    const config: StoreScrapingConfig = (window as any).STORE_CONFIGS[storeKey];
     if (!config) {
       console.error(`[GenericScraper] Unknown store: ${storeKey}`);
       return null;
@@ -75,9 +65,9 @@
     
     let resultsSent = false;
     
-    const scrapeProducts = () => {
+    const scrapeProducts = (): Product[] => {
       console.log(`[${config.name}] Starting to scrape products`);
-      const products = [];
+      const products: Product[] = [];
       const containers = document.querySelectorAll(config.productSelector);
       
       console.log(`[${config.name}] Found ${containers.length} product containers`);
@@ -86,7 +76,7 @@
         try {
           let name = '';
           let price = '';
-          let imageUrl = '';
+          let image = '';
           
           // Handle special cases for stores with custom extractors
           if (config.nameExtractor) {
@@ -96,9 +86,9 @@
           }
           
           if (config.imageExtractor) {
-            imageUrl = config.imageExtractor(container);
+            image = config.imageExtractor(container);
           } else {
-            imageUrl = extractImage(container, config.fields.image);
+            image = extractImage(container, config.fields.image);
           }
           
           // Handle price parsing
@@ -113,7 +103,7 @@
               price = config.priceParser(priceElement);
             } else {
               // Default text extraction
-              price = priceElement ? priceElement.textContent.trim() : '';
+              price = priceElement ? priceElement.textContent?.trim() || '' : '';
             }
           }
           
@@ -126,10 +116,10 @@
             products.push({
               name,
               price,
-              imageUrl,
+              image,
               discount,
               sale,
-              sales_desc: salesDesc
+              salesDesc
             });
           } else {
             console.log(`[${config.name}] Skipping product ${index} - missing name or price:`, { name, price });
@@ -143,7 +133,7 @@
       return products;
     };
     
-    const sendResults = (results) => {
+    const sendResults = (results: Product[]): void => {
       if (resultsSent) return;
       resultsSent = true;
       
@@ -155,10 +145,10 @@
       });
     };
     
-    const waitAndScrape = () => {
+    const waitAndScrape = (): void => {
       let attempt = 1;
       
-      const tryScape = () => {
+      const tryScape = (): void => {
         const containers = document.querySelectorAll(config.productSelector);
         console.log(`[${config.name}] Attempt ${attempt}: Found ${containers.length} product containers`);
         
@@ -190,7 +180,7 @@
   };
   
   // Auto-initialize when script loads
-  const init = () => {
+  const init = (): void => {
     const storeKey = detectStore();
     if (!storeKey) return;
     
@@ -208,8 +198,8 @@
     }
     
     // Wait for configs to be available, then create and run scraper
-    const waitForConfigs = () => {
-      if (typeof window.STORE_CONFIGS === 'undefined') {
+    const waitForConfigs = (): void => {
+      if (typeof (window as any).STORE_CONFIGS === 'undefined') {
         setTimeout(waitForConfigs, 50);
         return;
       }

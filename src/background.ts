@@ -1,27 +1,28 @@
+/// <reference path="./shared-types.ts" />
 
 // Store configuration
-const STORES = {
+const STORES: Record<StoreKey, StoreConfig> = {
   kroger: {
     name: 'Kroger',
-    buildUrl: (term) => `https://www.kroger.com/search?query=${encodeURIComponent(term)}`,
+    buildUrl: (term: string): string => `https://www.kroger.com/search?query=${encodeURIComponent(term)}`,
     tabId: null,
     shouldClose: true
   },
   meijer: {
     name: 'Meijer', 
-    buildUrl: (term) => `https://www.meijer.com/shopping/search.html?text=${encodeURIComponent(term)}`,
+    buildUrl: (term: string): string => `https://www.meijer.com/shopping/search.html?text=${encodeURIComponent(term)}`,
     tabId: null,
     shouldClose: true
   },
   aldi: {
     name: 'Aldi',
-    buildUrl: (term) => `https://www.aldi.us/results?q=${encodeURIComponent(term)}`,
+    buildUrl: (term: string): string => `https://www.aldi.us/results?q=${encodeURIComponent(term)}`,
     tabId: null,
     shouldClose: true
   },
   walmart: {
     name: 'Walmart',
-    buildUrl: (term) => {
+    buildUrl: (term: string): string => {
       const filter = `exclude_oos:Show+available+items+only||fulfillment_method_in_store:In-store`;
       return `https://www.walmart.com/search?q=${encodeURIComponent(term)}&${encodeURIComponent(filter)}`;
     },
@@ -30,7 +31,7 @@ const STORES = {
   },
   costco: {
     name: 'Costco',
-    buildUrl: (term) => {
+    buildUrl: (term: string): string => {
       const filter = `refine=item_program_eligibility-InWarehouse`;
       return `https://www.costco.com/s?keyword=${encodeURIComponent(term)}&${encodeURIComponent(filter)}`;
     },
@@ -40,13 +41,13 @@ const STORES = {
 };
 
 const SEARCH_TIMEOUT_MS = 15_000; // 15 seconds timeout for search completion
-let searchResults = {}; // Track results from each store
-let searchTimeout = null; // Track timeout for search completion
+let searchResults: Record<string, SearchResult> = {}; // Track results from each store
+let searchTimeout: number | null = null; // Track timeout for search completion
 
 /**
  * Sets the `searchResults` in chrome.storage.local in the format expected by results page
  */
-const updateSearchResults = () => {
+const updateSearchResults = (): void => {
   const resultsArray = Object.values(searchResults);
   console.log('[Background] Updating combined results:', resultsArray);
   chrome.storage.local.set({ searchResults: resultsArray }, () => {
@@ -57,10 +58,10 @@ const updateSearchResults = () => {
 /**
  * Checks if all enabled stores have reported results and updates storage if so
  */
-const checkSearchCompletion = () => {
+const checkSearchCompletion = (): void => {
   // Get the enabled stores from the current search settings
   chrome.storage.local.get(['storeSettings'], (result) => {
-    const settings = result.storeSettings || {};
+    const settings: StoreSettings = result['storeSettings'] || {};
     const enabledStores = Object.keys(STORES).filter(storeKey => {
       const storeSettings = settings[storeKey];
       return storeSettings && storeSettings.enabled;
@@ -90,14 +91,10 @@ const checkSearchCompletion = () => {
   });
 };
 
-
 /**
  * Creates a new tab for a specific store's search results.
- * @param storeKey 
- * @param term 
- * @param closeTab
  */
-const createStoreTab = (storeKey, term, closeTab = true) => {
+const createStoreTab = (storeKey: StoreKey, term: string, closeTab: boolean = true): void => {
   const store = STORES[storeKey];
   const url = store.buildUrl(term);
   
@@ -105,27 +102,25 @@ const createStoreTab = (storeKey, term, closeTab = true) => {
   console.log(`Close tab after search: ${closeTab}`);
   
   chrome.tabs.create({ url, active: false }, (tab) => {
-    STORES[storeKey].tabId = tab.id;
-    STORES[storeKey].shouldClose = closeTab;
-    console.log(`[Background] Created ${store.name} tab with ID:`, tab.id);
+    if (tab.id) {
+      STORES[storeKey].tabId = tab.id;
+      STORES[storeKey].shouldClose = closeTab;
+      console.log(`[Background] Created ${store.name} tab with ID:`, tab.id);
+    }
   });
 };
 
-
 /**
  * Handles behavior when results are received from the provided store.
- * @param storeKey 
- * @param results 
- * @param searchUrl
  */
-const handleStoreResults = (storeKey, results, searchUrl) => {
+const handleStoreResults = (storeKey: StoreKey, results: Product[], searchUrl: string): void => {
   const store = STORES[storeKey];
   console.log(`[Background] Received ${storeKey} results:`, results);
 
   // Store results
   searchResults[storeKey] = {
     name: store.name,
-    items: results.length ? results : [{ name: 'No results found', price: '' }],
+    products: results.length ? results : [{ name: 'No results found', price: '', image: '', discount: false, sale: false, salesDesc: '' }],
     searchUrl: searchUrl
   };
 
@@ -142,14 +137,14 @@ const handleStoreResults = (storeKey, results, searchUrl) => {
 
 /**
  * Initializes the search process for the given term by creating tabs for each store and opening results page.
- * @param term 
  */
-const initializeSearch = (term, settings = {}) => {
+const initializeSearch = (term: string, settings: StoreSettings = {}): void => {
   // Clear previous results and reset tab IDs
   searchResults = {};
   Object.keys(STORES).forEach(storeKey => {
-    STORES[storeKey].tabId = null;
-    STORES[storeKey].shouldClose = true; // Reset to default
+    const key = storeKey as StoreKey;
+    STORES[key].tabId = null;
+    STORES[key].shouldClose = true; // Reset to default
   });
   
   if (searchTimeout) {
@@ -181,33 +176,42 @@ const initializeSearch = (term, settings = {}) => {
   
   // Only open tabs for enabled stores
   Object.keys(STORES).forEach(storeKey => {
-    const storeSettings = settings[storeKey];
+    const key = storeKey as StoreKey;
+    const storeSettings = settings[key];
     if (storeSettings && storeSettings.enabled) {
-      createStoreTab(storeKey, term, storeSettings.closeTab);
+      createStoreTab(key, term, storeSettings.closeTab);
     } else {
-      console.log(`[Background] Skipping ${storeKey} - disabled in settings`);
+      console.log(`[Background] Skipping ${key} - disabled in settings`);
     }
   });
 };
 
+interface StoreResultMessage {
+  action: string;
+  results: Product[];
+  searchUrl: string;
+}
+
 /**
  * The listener for messages from content scripts and results page
  */
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message: SearchMessage | StoreResultMessage, _sender, _sendResponse) => {
   // The 'search' action comes from the popup to start a new search
   if (message.action === 'search') {
-    const term = message.term;
-    const settings = message.settings || {};
+    const searchMessage = message as SearchMessage;
+    const term = searchMessage.term;
+    const settings = searchMessage.settings || {};
     console.log('[Background] Starting search for:', term);
     console.log('[Background] With settings:', settings);
     initializeSearch(term, settings);
-    return false;
+    return;
   }
   
   // Search result messages will have actions like 'krogerResults', 'meijerResults', etc.
-  const storeKey = message.action.replace('Results', '');
+  const storeResultMessage = message as StoreResultMessage;
+  const storeKey = storeResultMessage.action.replace('Results', '') as StoreKey;
   if (STORES[storeKey]) {
-    handleStoreResults(storeKey, message.results, message.searchUrl);
+    handleStoreResults(storeKey, storeResultMessage.results, storeResultMessage.searchUrl);
     checkSearchCompletion();
   }
 });

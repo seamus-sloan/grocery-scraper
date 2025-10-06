@@ -1,5 +1,7 @@
+/// <reference path="../shared-types.ts" />
+
 // Store configurations for the generic scraper
-const STORE_CONFIGS = {
+const STORE_CONFIGS: ScrapingConfigs = {
   kroger: {
     name: 'Kroger',
     productSelector: '.ProductCard',
@@ -9,18 +11,18 @@ const STORE_CONFIGS = {
       image: 'img[data-testid="product-image-loaded"]',
       discount: {
         selector: '.kds-Price-promotional',
-        condition: (el) => el && 
+        condition: (el: Element | null) => el !== null && 
           el.classList.contains('kds-Price-promotional--decorated') && 
           !el.classList.contains('kds-Price-promotional--plain')
       },
       sale: {
         selector: '[data-testid="savings-zone-text"]',
-        condition: (el) => el !== null
+        condition: (el: Element | null) => el !== null
       },
       salesDesc: '[data-testid="savings-zone-text"]'
     },
-    priceParser: (priceElement) => {
-      return "$" + (priceElement ? priceElement.getAttribute('value') : '');
+    priceParser: (priceElement: Element | null): string => {
+      return "$" + (priceElement ? priceElement.getAttribute('value') || '' : '');
     },
     maxRetries: 20,
     retryInterval: 1000
@@ -35,20 +37,22 @@ const STORE_CONFIGS = {
       image: '.product-tile__image',
       discount: {
         selector: '.product-tile__sale-price span:not(.sr-only)',
-        condition: (el) => el && el.textContent.trim()
+        condition: (el: Element | null) => el !== null && el.textContent?.trim() !== ''
       },
       sale: {
         selector: '.product-tile__savings-price',
-        condition: (el) => el !== null
+        condition: (el: Element | null) => el !== null
       },
       salesDesc: '.product-tile__savings-price'
     },
-    priceParser: (container) => {
+    priceParser: (container: Element | null): string => {
+      if (!container) return '';
+      
       // Try sale price first, then regular price
       let priceElement = container.querySelector('.product-tile__sale-price span:not(.sr-only)');
       let price = '';
 
-      if (priceElement && priceElement.textContent.trim()) {
+      if (priceElement && priceElement.textContent?.trim()) {
         price = priceElement.textContent.trim();
       } else {
         // No sale price, get regular price
@@ -57,13 +61,13 @@ const STORE_CONFIGS = {
           const priceText = regularPriceContainer.querySelector('.product-tile__regular-price-text');
           const unitsText = regularPriceContainer.querySelector('.product-tile__units');
 
-          price = priceText ? priceText.textContent.trim() : '';
-          if (unitsText && unitsText.textContent.trim()) {
+          price = priceText ? priceText.textContent?.trim() || '' : '';
+          if (unitsText && unitsText.textContent?.trim()) {
             price = `${price} ${unitsText.textContent.trim()}`;
           }
         } else {
           priceElement = container.querySelector('.product-tile__regular-price-text');
-          price = priceElement ? priceElement.textContent.trim() : '';
+          price = priceElement ? priceElement.textContent?.trim() || '' : '';
         }
       }
       return price;
@@ -89,8 +93,8 @@ const STORE_CONFIGS = {
       },
       salesDesc: null
     },
-    priceParser: (priceElement) => {
-      return priceElement ? priceElement.textContent.trim() : '';
+    priceParser: (priceElement: Element | null): string => {
+      return priceElement ? priceElement.textContent?.trim() || '' : '';
     },
     maxRetries: 10,
     retryInterval: 1000
@@ -105,21 +109,21 @@ const STORE_CONFIGS = {
       image: '[data-testid="productTileImage"]',
       discount: {
         selector: '[data-testid="badgeTagComponent"]',
-        condition: (el) => el && el.textContent.toLowerCase().includes('rollback')
+        condition: (el: Element | null) => el !== null && el.textContent?.toLowerCase().includes('rollback') || false
       },
       sale: {
         selector: '.product-tile__savings-price',
-        condition: (el) => el !== null
+        condition: (el: Element | null) => el !== null
       },
       salesDesc: '[data-testid="badgeTagComponent"]'
     },
-    priceParser: (priceContainer) => {
+    priceParser: (priceContainer: Element | null): string => {
       if (!priceContainer) return '';
       
       // Method 1: Try to get the readable "current price" span
       const currentPriceSpan = priceContainer.querySelector('span.w_iUH7');
       if (currentPriceSpan) {
-        const priceText = currentPriceSpan.textContent.trim();
+        const priceText = currentPriceSpan.textContent?.trim() || '';
         const priceMatch = priceText.match(/current price (\$[\d,.]+)/);
         if (priceMatch) {
           return priceMatch[1];
@@ -135,14 +139,14 @@ const STORE_CONFIGS = {
         if (dollarSpan && priceSpans.length > 0) {
           let constructedPrice = '$';
           priceSpans.forEach(span => {
-            constructedPrice += span.textContent.trim();
+            constructedPrice += span.textContent?.trim() || '';
           });
           return constructedPrice;
         }
       }
       
       // Method 3: Fallback - get all price-related text
-      return priceContainer.textContent.trim().split('\n')[0] || '';
+      return priceContainer.textContent?.trim().split('\n')[0] || '';
     },
     maxRetries: 10,
     retryInterval: 500
@@ -165,7 +169,9 @@ const STORE_CONFIGS = {
       },
       salesDesc: null
     },
-    priceParser: (container) => {
+    priceParser: (container: Element | null): string => {
+      if (!container) return '';
+      
       // Extract product ID from the data-testid attribute
       const testId = container.getAttribute('data-testid');
       const productId = testId ? testId.replace('ProductTile_', '') : '';
@@ -173,18 +179,18 @@ const STORE_CONFIGS = {
       if (!productId) return '';
       
       const priceElement = container.querySelector(`[data-testid="Text_Price_${productId}"]`);
-      return priceElement ? priceElement.textContent.trim() : '';
+      return priceElement ? priceElement.textContent?.trim() || '' : '';
     },
-    nameExtractor: (container) => {
+    nameExtractor: (container: Element): string => {
       const testId = container.getAttribute('data-testid');
       const productId = testId ? testId.replace('ProductTile_', '') : '';
       
       if (!productId) return '';
       
       const titleElement = container.querySelector(`[data-testid="Text_ProductTile_${productId}_title"]`);
-      return titleElement ? titleElement.textContent.trim() : '';
+      return titleElement ? titleElement.textContent?.trim() || '' : '';
     },
-    imageExtractor: (container) => {
+    imageExtractor: (container: Element): string => {
       const testId = container.getAttribute('data-testid');
       const productId = testId ? testId.replace('ProductTile_', '') : '';
       
@@ -192,7 +198,7 @@ const STORE_CONFIGS = {
       
       const imageContainer = container.querySelector(`[data-testid="ProductImage_${productId}"]`);
       if (imageContainer) {
-        const img = imageContainer.querySelector('img');
+        const img = imageContainer.querySelector('img') as HTMLImageElement;
         return img ? img.src : '';
       }
       return '';
@@ -202,9 +208,5 @@ const STORE_CONFIGS = {
   },
 };
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = STORE_CONFIGS;
-} else {
-  window.STORE_CONFIGS = STORE_CONFIGS;
-}
+// Make it available globally for browser extension context
+(window as any).STORE_CONFIGS = STORE_CONFIGS;

@@ -1,18 +1,93 @@
-# Grocery Scraper
+# Grocery Scraper (TypeScript)
+
+A Chrome extension for comparing grocery prices across multiple stores. Originally built in JavaScript, now fully converted to TypeScript for better type safety and developer experience.
 
 Saw my wife with 5 chrome tabs open trying to plot her route between multiple grocery stores to get the lowest prices on all our groceries and figured there had to be a better way. I would have preferred to use something like Playwright to scrape through the websites and return the data... but playwright's user agent was constantly getting blocked. Controlling a _real_ browser avoids that limitation entirely and might even be more convenient anyways.
 
----
+## 🏗️ Development Setup
 
-# Installation
+### Prerequisites
+- Node.js (v16 or higher)
+- npm
 
-1. Download or clone the repository
-2. Open `chrome://extensions/`
-3. Turn on developer mode (_On Chrome, this is a toggle switch in the upper right_)
-4. Click on `Load Unpacked`
-5. Select this folder
+### Installation
 
----
+1. Clone or download the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-# How to Use
-Just click on the extension, enter a search term, and within a few seconds you'll see 5 new chrome tabs open and close leaving you with the search results from all of them.
+3. Build the extension:
+   ```bash
+   npm run prepare-extension
+   ```
+
+4. Load the extension in Chrome:
+   - Open `chrome://extensions/`
+   - Turn on developer mode (toggle switch in the upper right)
+   - Click on `Load Unpacked`
+   - Select the `dist` folder
+
+## 🚀 Development Commands
+
+- `npm run build` - Compile TypeScript files
+- `npm run watch` - Watch for changes and recompile automatically
+- `npm run clean` - Remove the dist folder
+- `npm run prepare-extension` - Full build and asset copy for extension loading
+- `npm run dev` - Clean, build, and watch for changes
+
+## 📁 Project Structure
+
+```
+src/
+├── types/           # TypeScript type definitions
+├── scraping/        # Content scripts for web scraping
+├── background.ts    # Service worker (background script)
+├── popup.ts         # Extension popup interface
+└── results.ts       # Results page functionality
+
+dist/               # Compiled JavaScript output (for extension)
+```
+
+## 🔧 TypeScript Features
+
+The codebase now includes:
+- **Strict TypeScript configuration** with comprehensive type checking
+- **Interface definitions** for store configurations, search results, and messages
+- **Type-safe Chrome extension APIs** with `@types/chrome`
+- **Source maps** for debugging
+- **Declaration files** for better IDE support
+
+## 🛒 Supported Stores
+
+- **Kroger** - kroger.com
+- **Meijer** - meijer.com  
+- **Aldi** - aldi.us
+- **Walmart** - walmart.com
+- **Costco** - costco.com
+
+Each store has its own scraping configuration with type-safe definitions.
+
+## 🎯 How to Use
+
+1. Click on the extension icon
+2. Enter a search term (e.g., "organic bananas")
+3. Configure which stores to search (optional)
+4. Click Search or press Enter
+5. The extension will open tabs for each enabled store, scrape results, and display them in a comparison view
+
+## 🔍 Technical Details
+
+- **Manifest V3** Chrome extension
+- **TypeScript 5.6+** with strict type checking
+- **ES2020** target for modern browser features
+- **Modular architecture** with clear separation of concerns
+- **Type-safe message passing** between extension components
+
+## 🧪 Development Notes
+
+- The extension compiles TypeScript to JavaScript that runs in the browser
+- Content scripts are injected into store websites to scrape product data
+- Background script coordinates searches and manages tab lifecycle
+- All Chrome extension APIs are properly typed with official type definitions

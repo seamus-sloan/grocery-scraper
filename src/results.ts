@@ -1,10 +1,12 @@
+/// <reference path="./shared-types.ts" />
+
 // JavaScript for results page
 (function() {
   // Fixed store order
   const STORE_ORDER = ['Kroger', 'Meijer', 'Aldi', 'Walmart', 'Costco'];
   
   // Store name to CSS class mapping
-  const STORE_CLASSES = {
+  const STORE_CLASSES: Record<string, string> = {
     'Kroger': 'store-kroger',
     'Meijer': 'store-meijer', 
     'Aldi': 'store-aldi',
@@ -12,14 +14,18 @@
     'Costco': 'store-costco'
   };
 
-  function getUrlParams() {
+  interface UrlParams {
+    term: string;
+  }
+
+  function getUrlParams(): UrlParams {
     const urlParams = new URLSearchParams(window.location.search);
     return {
       term: urlParams.get('term') || 'Unknown'
     };
   }
 
-  function sortStoresByOrder(results) {
+  function sortStoresByOrder(results: SearchResult[]): SearchResult[] {
     return results.sort((a, b) => {
       const indexA = STORE_ORDER.indexOf(a.name);
       const indexB = STORE_ORDER.indexOf(b.name);
@@ -32,29 +38,36 @@
     });
   }
 
-  function toggleMoreResults(button) {
+  function toggleMoreResults(button: HTMLButtonElement): void {
     const storeColumn = button.closest('.store-column');
+    if (!storeColumn) return;
+    
     const hiddenItems = storeColumn.querySelectorAll('.hidden-item');
-    const hiddenCount = parseInt(button.dataset.hiddenCount);
+    const hiddenCount = parseInt(button.dataset['hiddenCount'] || '0');
     
     // Check if items are currently hidden
-    const isHidden = hiddenItems[0]?.hasAttribute('hidden');
+    const firstHiddenItem = hiddenItems[0] as HTMLElement;
+    const isHidden = firstHiddenItem?.hasAttribute('hidden');
     
     if (isHidden) {
       // Show all hidden items
-      hiddenItems.forEach(item => item.removeAttribute('hidden'));
+      hiddenItems.forEach(item => (item as HTMLElement).removeAttribute('hidden'));
       button.textContent = 'Show less';
     } else {
       // Hide all extra items
-      hiddenItems.forEach(item => item.setAttribute('hidden', ''));
+      hiddenItems.forEach(item => (item as HTMLElement).setAttribute('hidden', ''));
       button.textContent = `Show ${hiddenCount} more`;
     }
   }
 
-  function displayResults(results, searchTerm) {
-    document.getElementById('searchTerm').textContent = `Results for "${searchTerm}"`;
+  function displayResults(results: SearchResult[], searchTerm: string): void {
+    const searchTermElement = document.getElementById('searchTerm');
+    if (searchTermElement) {
+      searchTermElement.textContent = `Results for "${searchTerm}"`;
+    }
     
     const resultsContainer = document.getElementById('results');
+    if (!resultsContainer) return;
     
     if (!results || results.length === 0) {
       resultsContainer.innerHTML = '<div class="loading">No results found.</div>';
@@ -67,7 +80,7 @@
     let html = '<div class="stores-container">';
     
     sortedResults.forEach(store => {
-      const items = store.items;
+      const items = store.products;
       const initialItems = items.slice(0, 15); // Show first 15 items
       const hiddenItems = items.slice(15); // Rest of the items
       const storeClass = STORE_CLASSES[store.name] || '';
@@ -83,21 +96,21 @@
           <div class="products-list">
             ${initialItems.map(item => `
               <div class="product-item${item.discount ? ' has-discount' : ''}">
-                ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}" class="product-image" onerror="this.style.display='none'">` : ''}
+                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="product-image">` : ''}
                 <div class="product-details">
                   <div class="product-name">${item.name}</div>
                   <div class="product-price">${item.price}</div>
-                  ${item.sale ? `<div class="sale-info" title="${item.sales_desc}">${item.sales_desc}</div>` : ''}
+                  ${item.sale ? `<div class="sale-info" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
                 </div>
               </div>
             `).join('')}
             ${hiddenItems.map(item => `
               <div class="product-item hidden-item${item.discount ? ' has-discount' : ''}" hidden>
-                ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}" class="product-image" onerror="this.style.display='none'">` : ''}
+                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="product-image">` : ''}
                 <div class="product-details">
                   <div class="product-name">${item.name}</div>
                   <div class="product-price">${item.price}</div>
-                  ${item.sale ? `<div class="sale-info" title="${item.sales_desc}">${item.sales_desc}</div>` : ''}
+                  ${item.sale ? `<div class="sale-info" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
                 </div>
               </div>
             `).join('')}
@@ -119,22 +132,32 @@
     // Add event listeners to show-more buttons
     const showMoreButtons = resultsContainer.querySelectorAll('.show-more-btn');
     showMoreButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        toggleMoreResults(this);
+      const btn = button as HTMLButtonElement;
+      btn.addEventListener('click', function() {
+        toggleMoreResults(btn);
+      });
+    });
+    
+    // Add error handling for product images
+    const productImages = resultsContainer.querySelectorAll('.product-image');
+    productImages.forEach(img => {
+      const imageElement = img as HTMLImageElement;
+      imageElement.addEventListener('error', function() {
+        this.style.display = 'none';
       });
     });
   }
 
-  function pollForResults() {
+  function pollForResults(): void {
     const { term } = getUrlParams();
     
     chrome.storage.local.get(['searchResults', 'currentSearchTerm'], (result) => {
       console.log('Polling for results:', result);
       console.log('Looking for term:', term);
       
-      if (result.searchResults) {
+      if (result['searchResults']) {
         console.log('Found results, displaying...');
-        displayResults(result.searchResults, term);
+        displayResults(result['searchResults'], term);
       } else {
         console.log('No results yet, polling again...');
         // Keep polling for results
@@ -143,9 +166,12 @@
     });
   }
 
-  function handleNewSearch() {
-    const searchInput = document.getElementById('newSearchTerm');
-    const searchBtn = document.getElementById('newSearchBtn');
+  function handleNewSearch(): void {
+    const searchInput = document.getElementById('newSearchTerm') as HTMLInputElement;
+    const searchBtn = document.getElementById('newSearchBtn') as HTMLButtonElement;
+    
+    if (!searchInput || !searchBtn) return;
+    
     const searchTerm = searchInput.value.trim();
     
     if (!searchTerm) {
@@ -160,7 +186,7 @@
     
     // Get current store settings from storage and start new search
     chrome.storage.local.get(['storeSettings'], (result) => {
-      const settings = result.storeSettings || {};
+      const settings: StoreSettings = result['storeSettings'] || {};
       
       // Send search message to background script
       chrome.runtime.sendMessage({
@@ -175,9 +201,9 @@
     });
   }
 
-  function initializeNewSearch() {
-    const searchInput = document.getElementById('newSearchTerm');
-    const searchBtn = document.getElementById('newSearchBtn');
+  function initializeNewSearch(): void {
+    const searchInput = document.getElementById('newSearchTerm') as HTMLInputElement;
+    const searchBtn = document.getElementById('newSearchBtn') as HTMLButtonElement;
     
     if (!searchInput || !searchBtn) return;
     
@@ -185,7 +211,7 @@
     searchBtn.addEventListener('click', handleNewSearch);
     
     // Handle Enter key in input
-    searchInput.addEventListener('keypress', (e) => {
+    searchInput.addEventListener('keypress', (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         handleNewSearch();
@@ -193,8 +219,9 @@
     });
     
     // Handle input events for better UX
-    searchInput.addEventListener('input', (e) => {
-      const hasValue = e.target.value.trim().length > 0;
+    searchInput.addEventListener('input', (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const hasValue = target.value.trim().length > 0;
       searchBtn.disabled = !hasValue;
     });
     
@@ -204,7 +231,10 @@
 
   // Initialize
   const { term } = getUrlParams();
-  document.getElementById('searchTerm').textContent = `Searching for "${term}"...`;
+  const searchTermElement = document.getElementById('searchTerm');
+  if (searchTermElement) {
+    searchTermElement.textContent = `Searching for "${term}"...`;
+  }
   
   // Initialize new search functionality
   initializeNewSearch();
