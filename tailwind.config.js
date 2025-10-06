@@ -5,6 +5,12 @@ module.exports = {
     "./*.html",
     "./dist/**/*.{html,js}"
   ],
+  safelist: [
+    'max-h-96',
+    'opacity-100',
+    'max-h-0',
+    'opacity-0'
+  ],
   theme: {
     extend: {
       spacing: {

@@ -77,7 +77,7 @@
     // Sort stores in fixed order
     const sortedResults = sortStoresByOrder(results);
     
-    let html = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">';
+    let html = '<div class="grid gap-5 w-full" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">';
     
     sortedResults.forEach(store => {
       const items = store.products;
@@ -93,7 +93,7 @@
               `<h3 class="text-lg font-semibold text-center">${store.name}</h3>`
             }
           </div>
-          <div class="flex-1 overflow-y-auto max-h-96">
+          <div class="flex-1 overflow-y-auto min-h-screen">
             ${initialItems.map(item => `
               <div class="border border-gray-200 rounded-xl p-3 mb-3 bg-white transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-amber-500 flex gap-3 items-start min-h-[80px] relative${item.discount ? ' shadow-md' : ''}">
                 ${item.discount ? `

@@ -70,15 +70,24 @@ const initializeCollapsibleSections = (): void => {
 
 const toggleCollapse = (header: HTMLElement, content: HTMLElement): void => {
   const isCollapsed = content.classList.contains('collapsed');
+  const icon = header.querySelector('.collapse-icon') as HTMLElement;
   
   if (isCollapsed) {
     // Expand
-    content.classList.remove('collapsed');
+    content.classList.remove('collapsed', 'max-h-0', 'opacity-0');
+    content.classList.add('max-h-96', 'opacity-100');
     header.classList.remove('collapsed');
+    if (icon) {
+      icon.style.transform = 'rotate(180deg)';
+    }
   } else {
-    // Collapse
-    content.classList.add('collapsed');
+    // Collapse  
+    content.classList.add('collapsed', 'max-h-0', 'opacity-0');
+    content.classList.remove('max-h-96', 'opacity-100');
     header.classList.add('collapsed');
+    if (icon) {
+      icon.style.transform = 'rotate(0deg)';
+    }
   }
 };
 
