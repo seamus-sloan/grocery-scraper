@@ -10,7 +10,7 @@
     "clean": "rm -rf dist",
     "dev": "npm run clean && npm run build && npm run build:css && npm run watch",
     "prepare-extension": "npm run clean && npm run build && npm run copy-assets && npm run build:css && npm run cleanup-assets",
-    "copy-assets": "cp manifest.json dist/ && cp *.html dist/ && cp -r scraping/itemExamples dist/scraping/ 2>/dev/null || true",
+    "copy-assets": "cp manifest.json dist/ && cp *.html dist/ && cp -r icons dist/ 2>/dev/null || true && cp -r scraping/itemExamples dist/scraping/ 2>/dev/null || true",
     "cleanup-assets": "rm -rf dist/styles/assets dist/styles/*.js 2>/dev/null || true"
   },
   "devDependencies": {
