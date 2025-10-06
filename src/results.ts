@@ -70,7 +70,7 @@
     if (!resultsContainer) return;
     
     if (!results || results.length === 0) {
-      resultsContainer.innerHTML = '<div class="text-center text-gray-600">No results found.</div>';
+      resultsContainer.innerHTML = '<div class="text-center text-text-secondary">No results found.</div>';
       return;
     }
 
@@ -86,7 +86,7 @@
       const headerGradient = STORE_HEADER_GRADIENTS[store.name] || 'bg-gradient-to-r from-gray-600 to-gray-500';
 
       html += `
-        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
+        <div class="bg-background-light rounded-xl border border-border overflow-hidden flex flex-col">
           <div class="px-5 py-4 ${headerGradient} text-white">
             ${store.searchUrl ? 
               `<a href="${store.searchUrl}" target="_blank" class="text-lg font-semibold text-white hover:text-gray-100 hover:underline transition-colors block text-center">${store.name}</a>` : 
@@ -95,39 +95,39 @@
           </div>
           <div class="flex-1 overflow-y-auto min-h-screen">
             ${initialItems.map(item => `
-              <div class="border border-gray-200 rounded-xl p-3 mb-3 bg-white transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-amber-500 flex gap-3 items-start min-h-[80px] relative${item.discount ? ' shadow-md' : ''}">
+              <div class="border border-border rounded-xl p-3 mb-3 bg-background-light transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-primary flex gap-3 items-start min-h-[80px] relative${item.discount ? ' shadow-md' : ''}">
                 ${item.discount ? `
                   <div class="absolute left-0 top-0 bottom-0 w-5 bg-gradient-to-b from-red-500 to-red-600 text-white text-xs font-bold flex items-center justify-center rounded-l-xl">
                     <span class="writing-mode-vertical text-center transform rotate-180" style="writing-mode: vertical-lr; text-orientation: mixed;">PRICE CUT</span>
                   </div>
                 ` : ''}
-                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-15 h-15 object-contain rounded-lg bg-white border border-gray-200 flex-shrink-0${item.discount ? ' ml-2' : ''}">` : ''}
+                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-15 h-15 object-contain rounded-lg bg-background-light border border-border flex-shrink-0${item.discount ? ' ml-2' : ''}">` : ''}
                 <div class="flex-1 min-w-0 flex flex-col gap-1.5">
-                  <div class="text-sm font-semibold text-gray-800 leading-tight line-clamp-2">${item.name}</div>
-                  <div class="text-lg font-bold text-amber-600">${item.price}</div>
-                  ${item.sale ? `<div class="text-xs bg-gradient-to-r from-indigo-100 to-green-100 text-gray-800 px-2 py-1 rounded text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
+                  <div class="text-sm font-semibold text-text leading-tight line-clamp-2">${item.name}</div>
+                  <div class="text-lg font-bold text-primary">${item.price}</div>
+                  ${item.sale ? `<div class="text-xs bg-accent text-text px-2 py-1 rounded text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
                 </div>
               </div>
             `).join('')}
             ${hiddenItems.map(item => `
-              <div class="border border-gray-200 rounded-xl p-3 mb-3 bg-white transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-amber-500 flex gap-3 items-start min-h-[80px] relative hidden-item${item.discount ? ' shadow-md' : ''}" hidden>
+              <div class="border border-border rounded-xl p-3 mb-3 bg-background-light transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-primary flex gap-3 items-start min-h-[80px] relative hidden-item${item.discount ? ' shadow-md' : ''}" hidden>
                 ${item.discount ? `
                   <div class="absolute left-0 top-0 bottom-0 w-5 bg-gradient-to-b from-red-500 to-red-600 text-white text-xs font-bold flex items-center justify-center rounded-l-xl">
                     <span class="writing-mode-vertical text-center transform rotate-180" style="writing-mode: vertical-lr; text-orientation: mixed;">PRICE CUT</span>
                   </div>
                 ` : ''}
-                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-15 h-15 object-contain rounded-lg bg-white border border-gray-200 flex-shrink-0${item.discount ? ' ml-2' : ''}">` : ''}
+                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-15 h-15 object-contain rounded-lg bg-background-light border border-border flex-shrink-0${item.discount ? ' ml-2' : ''}">` : ''}
                 <div class="flex-1 min-w-0 flex flex-col gap-1.5">
-                  <div class="text-sm font-semibold text-gray-800 leading-tight line-clamp-2">${item.name}</div>
-                  <div class="text-lg font-bold text-amber-600">${item.price}</div>
-                  ${item.sale ? `<div class="text-xs bg-gradient-to-r from-indigo-100 to-green-100 text-gray-800 px-2 py-1 rounded text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
+                  <div class="text-sm font-semibold text-text leading-tight line-clamp-2">${item.name}</div>
+                  <div class="text-lg font-bold text-primary">${item.price}</div>
+                  ${item.sale ? `<div class="text-xs bg-accent text-text px-2 py-1 rounded text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
                 </div>
               </div>
             `).join('')}
           </div>
           ${hiddenItems.length > 0 ? `
-            <div class="p-4 border-t border-gray-200 bg-gray-50">
-              <button class="w-full px-4 py-2 bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 show-more-btn" data-hidden-count="${hiddenItems.length}">
+            <div class="p-4 border-t border-border bg-background-card">
+              <button class="w-full px-4 py-2 bg-gradient-to-br from-primary to-secondary text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 show-more-btn" data-hidden-count="${hiddenItems.length}">
                 Show ${hiddenItems.length} more
               </button>
             </div>
