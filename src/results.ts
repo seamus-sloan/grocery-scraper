@@ -61,7 +61,7 @@
   }
 
   function toggleMoreResults(button: HTMLButtonElement): void {
-    const storeColumn = button.closest('.bg-white');
+    const storeColumn = button.closest('.bg-background-light');
     if (!storeColumn) return;
     
     const hiddenItems = storeColumn.querySelectorAll('.hidden-item');
