@@ -127,7 +127,7 @@
                 <div class="flex-1 min-w-0 flex flex-col gap-1.5">
                   <div class="text-sm font-semibold text-text leading-tight line-clamp-2">${item.name}</div>
                   <div class="text-lg font-bold text-primary">${item.price}</div>
-                  ${item.sale ? `<div class="text-xs bg-accent text-text px-2 py-1 rounded text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
+                  ${item.sale ? `<div class="text-xs bg-gradient-to-br from-primary to-secondary text-white font-semibold px-2 py-1 rounded text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
                 </div>
               </div>
             `).join('')}
@@ -142,7 +142,7 @@
                 <div class="flex-1 min-w-0 flex flex-col gap-1.5">
                   <div class="text-sm font-semibold text-text leading-tight line-clamp-2">${item.name}</div>
                   <div class="text-lg font-bold text-primary">${item.price}</div>
-                  ${item.sale ? `<div class="text-xs bg-accent text-text px-2 py-1 rounded text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
+                  ${item.sale ? `<div class="text-xs bg-gradient-to-br from-primary to-secondary text-white font-semibold px-2 py-1 rounded text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap" title="${item.salesDesc}">${item.salesDesc}</div>` : ''}
                 </div>
               </div>
             `).join('')}

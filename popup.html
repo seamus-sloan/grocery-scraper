@@ -28,6 +28,24 @@
       <span class="text-xs transition-transform duration-300 text-text-light collapse-icon">▼</span>
     </div>    
     <div id="store-settings" class="max-h-0 overflow-hidden transition-all duration-300 opacity-0 pt-0 pb-0 collapsible-content collapsed">
+
+
+      <!-- Dark Mode Setting -->
+      <div class="p-3 bg-background-card rounded-xl border border-border">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path class="sun-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+              <path class="moon-icon hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+            <label for="darkModeToggle" class="font-medium cursor-pointer">Dark Mode</label>
+          </div>
+          <input type="checkbox" id="darkModeToggle" class="w-5 h-5 appearance-none bg-white border-2 border-border rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-primary checked:to-secondary checked:border-primary relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block">
+        </div>
+      </div>
+
+
+      <hr class="border-0 border-t border-border my-4">
       <div class="overflow-y-auto max-h-96">
       <div class="mb-3 p-3 bg-background-card rounded-xl border border-border store-kroger">
         <div class="flex items-center gap-3 mb-2">
@@ -91,22 +109,6 @@
             <input type="checkbox" id="closeCostco" class="w-4 h-4 appearance-none bg-white border-2 border-border rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-primary checked:to-secondary checked:border-primary relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block sub-checkbox">
             <label for="closeCostco" class="text-sm text-text-secondary cursor-pointer">Close tab after search</label>
           </div>
-        </div>
-      </div>
-
-      <hr class="border-0 border-t border-border my-4">
-
-      <!-- Dark Mode Setting -->
-      <div class="p-3 bg-background-card rounded-xl border border-border">
-        <div class="flex items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <svg class="w-5 h-5 text-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path class="sun-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-              <path class="moon-icon hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-            </svg>
-            <label for="darkModeToggle" class="font-medium cursor-pointer">Dark Mode</label>
-          </div>
-          <input type="checkbox" id="darkModeToggle" class="w-5 h-5 appearance-none bg-white border-2 border-border rounded cursor-pointer transition-all duration-200 checked:bg-gradient-to-br checked:from-primary checked:to-secondary checked:border-primary relative after:content-['✓'] after:text-white after:text-xs after:font-bold after:hidden checked:after:block">
         </div>
       </div>
       </div>

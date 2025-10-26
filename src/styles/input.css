@@ -44,3 +44,14 @@
   --color-text-light: var(--color-dark-text-light);
   --color-border: var(--color-dark-border);
 }
+
+/* Center checkmarks in checkboxes */
+input[type="checkbox"]::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
