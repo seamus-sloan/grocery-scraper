@@ -1,5 +1,3 @@
-// Shared type definitions for the grocery scraper extension
-
 interface StoreConfig {
   name: string;
   buildUrl: (term: string) => string;

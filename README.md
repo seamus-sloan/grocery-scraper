@@ -1,4 +1,4 @@
-# Grocery Scraper
+# Kelsey's Grocery Planner
 
 A Chrome extension for comparing grocery prices across multiple stores.
 

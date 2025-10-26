@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Grocery Scraper",
+  "name": "Kelsey's Grocery Planner",
   "version": "1.0",
   "description": "Search multiple grocery sites and compare prices with one search.",
   "permissions": ["scripting", "tabs", "storage"],
