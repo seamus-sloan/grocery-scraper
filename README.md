@@ -1,6 +1,6 @@
-# Grocery Scraper (TypeScript)
+# Grocery Scraper
 
-A Chrome extension for comparing grocery prices across multiple stores. Originally built in JavaScript, now fully converted to TypeScript for better type safety and developer experience.
+A Chrome extension for comparing grocery prices across multiple stores.
 
 Saw my wife with 5 chrome tabs open trying to plot her route between multiple grocery stores to get the lowest prices on all our groceries and figured there had to be a better way. I would have preferred to use something like Playwright to scrape through the websites and return the data... but playwright's user agent was constantly getting blocked. Controlling a _real_ browser avoids that limitation entirely and might even be more convenient anyways.
 
@@ -49,15 +49,6 @@ src/
 
 dist/               # Compiled JavaScript output (for extension)
 ```
-
-## 🔧 TypeScript Features
-
-The codebase now includes:
-- **Strict TypeScript configuration** with comprehensive type checking
-- **Interface definitions** for store configurations, search results, and messages
-- **Type-safe Chrome extension APIs** with `@types/chrome`
-- **Source maps** for debugging
-- **Declaration files** for better IDE support
 
 ## 🛒 Supported Stores
 
