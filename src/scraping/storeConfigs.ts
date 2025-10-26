@@ -133,20 +133,44 @@ const STORE_CONFIGS: ScrapingConfigs = {
       // Method 2: Try to construct price from separate spans
       const priceMainDiv = priceContainer.querySelector('div[aria-hidden="true"]');
       if (priceMainDiv) {
-        const dollarSpan = priceMainDiv.querySelector('span[style*="margin-right"]');
-        const priceSpans = priceMainDiv.querySelectorAll('span.f2, span.f6');
+        // Get all text content and extract just the numeric parts
+        const allText = priceMainDiv.textContent?.trim() || '';
         
-        if (dollarSpan && priceSpans.length > 0) {
-          let constructedPrice = '$';
-          priceSpans.forEach(span => {
-            constructedPrice += span.textContent?.trim() || '';
-          });
-          return constructedPrice;
+        // Remove all non-numeric characters except periods
+        let priceDigits = allText.replace(/[^\d]/g, '');
+        
+        // Format the price properly (e.g., "244" -> "2.44", "563" -> "5.63")
+        if (priceDigits.length > 0) {
+          // Insert decimal point before the last 2 digits
+          if (priceDigits.length > 2) {
+            const dollars = priceDigits.slice(0, -2);
+            const cents = priceDigits.slice(-2);
+            return `$${dollars}.${cents}`;
+          } else if (priceDigits.length === 2) {
+            return `$0.${priceDigits}`;
+          } else if (priceDigits.length === 1) {
+            return `$0.0${priceDigits}`;
+          }
         }
       }
       
-      // Method 3: Fallback - get all price-related text
-      return priceContainer.textContent?.trim().split('\n')[0] || '';
+      // Method 3: Fallback - try to extract price from full text
+      const fullText = priceContainer.textContent?.trim() || '';
+      const priceMatch = fullText.match(/\$?([\d]+)/);
+      if (priceMatch) {
+        const digits = priceMatch[1];
+        if (digits.length > 2) {
+          const dollars = digits.slice(0, -2);
+          const cents = digits.slice(-2);
+          return `$${dollars}.${cents}`;
+        } else if (digits.length === 2) {
+          return `$0.${digits}`;
+        } else if (digits.length === 1) {
+          return `$0.0${digits}`;
+        }
+      }
+      
+      return fullText.split('\n')[0] || '';
     },
     maxRetries: 10,
     retryInterval: 500
