@@ -1,5 +1,5 @@
 {
-  "name": "grocery-scraper",
+  "name": "grocery-planner",
   "version": "1.0.0",
   "description": "Chrome extension for comparing grocery prices across multiple stores",
   "scripts": {

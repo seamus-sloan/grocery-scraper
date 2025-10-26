@@ -40,8 +40,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   searchInput?.focus();
   
   // Handle Enter key submission
-  searchInput?.addEventListener('keypress', (e: KeyboardEvent) => {
+  searchInput?.addEventListener('keydown', (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       performSearch();
     }
   });
