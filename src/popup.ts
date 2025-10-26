@@ -34,18 +34,18 @@ const performSearch = async (): Promise<void> => {
 const searchBtn = document.getElementById('searchBtn');
 searchBtn?.addEventListener('click', performSearch);
 
-// Handle Enter key submission
-const searchInput = document.getElementById('searchTerm') as HTMLInputElement;
-searchInput?.addEventListener('keypress', (e: KeyboardEvent) => {
-  if (e.key === 'Enter') {
-    performSearch();
-  }
-});
-
 // Focus on search input when popup opens
 document.addEventListener('DOMContentLoaded', async () => {
   const searchInput = document.getElementById('searchTerm') as HTMLInputElement;
   searchInput?.focus();
+  
+  // Handle Enter key submission
+  searchInput?.addEventListener('keypress', (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      performSearch();
+    }
+  });
+  
   initializeCollapsibleSections();
   await loadSettings();
   initializeSettings();
