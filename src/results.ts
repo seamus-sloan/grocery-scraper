@@ -14,6 +14,28 @@
     'Costco': 'bg-gradient-to-r from-red-600 to-red-500'
   };
 
+  // Dark mode functionality - just apply on load
+  const initializeDarkMode = async (): Promise<void> => {
+    try {
+      const result = await chrome.storage.sync.get('darkMode');
+      // Default to dark mode if not set (undefined means first install)
+      const isDarkMode = result['darkMode'] !== undefined ? result['darkMode'] : true;
+      applyDarkMode(isDarkMode);
+    } catch (error) {
+      console.error('Error initializing dark mode:', error);
+    }
+  };
+
+  const applyDarkMode = (isDarkMode: boolean): void => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+    }
+  };
+
   interface UrlParams {
     term: string;
   }
@@ -245,6 +267,9 @@
   if (searchTermElement) {
     searchTermElement.textContent = `Searching for "${term}"...`;
   }
+  
+  // Initialize dark mode
+  initializeDarkMode();
   
   // Initialize new search functionality
   initializeNewSearch();

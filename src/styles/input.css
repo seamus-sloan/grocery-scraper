@@ -1,1 +1,46 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #B69EFF;
+  --color-primary-dark: #9B7EE6;
+  --color-primary-light: #C8B3FF;
+  
+  --color-secondary: #AC9BF3;
+  --color-secondary-dark: #9B88E6;
+  --color-secondary-light: #BFAFF7;
+  
+  --color-accent: #DCCCFA;
+  --color-accent-light: #F4EDFB;
+  
+  --color-background: #F4EDFB;
+  --color-background-light: #FFFFFF;
+  --color-background-card: #DCCCFA;
+  
+  --color-text: #4A5568;
+  --color-text-secondary: #718096;
+  --color-text-light: #A0AEC0;
+  
+  --color-border: #E2E8F0;
+  
+  /* Dark mode colors */
+  --color-dark-bg: #1a1625;
+  --color-dark-bg-light: #2a2535;
+  --color-dark-bg-card: #352f45;
+  --color-dark-text: #E5E7EB;
+  --color-dark-text-secondary: #9CA3AF;
+  --color-dark-text-light: #6B7280;
+  --color-dark-border: #4B5563;
+  
+  --spacing-15: 60px;
+}
+
+/* Dark mode styles */
+.dark {
+  --color-background: var(--color-dark-bg);
+  --color-background-light: var(--color-dark-bg-light);
+  --color-background-card: var(--color-dark-bg-card);
+  --color-text: var(--color-dark-text);
+  --color-text-secondary: var(--color-dark-text-secondary);
+  --color-text-light: var(--color-dark-text-light);
+  --color-border: var(--color-dark-border);
+}

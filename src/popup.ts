@@ -94,10 +94,12 @@ const toggleCollapse = (header: HTMLElement, content: HTMLElement): void => {
 // Load settings from storage
 const loadSettings = async (): Promise<void> => {
   try {
-    const result = await chrome.storage.sync.get('storeSettings');
+    const result = await chrome.storage.sync.get(['storeSettings', 'darkMode']);
     const settings: StoreSettings = result['storeSettings'] || defaultSettings;
+    // Default to dark mode if not set (undefined means first install)
+    const isDarkMode = result['darkMode'] !== undefined ? result['darkMode'] : true;
     
-    // Update checkboxes based on loaded settings
+    // Update store checkboxes based on loaded settings
     Object.keys(settings).forEach(store => {
       const storeKey = store as StoreKey;
       const enableCheckbox = document.getElementById(`enable${capitalizeFirst(storeKey)}`) as HTMLInputElement;
@@ -110,6 +112,14 @@ const loadSettings = async (): Promise<void> => {
         closeCheckbox.checked = settings[storeKey].closeTab;
       }
     });
+    
+    // Update dark mode checkbox and apply theme
+    const darkModeCheckbox = document.getElementById('darkModeToggle') as HTMLInputElement;
+    if (darkModeCheckbox) {
+      darkModeCheckbox.checked = isDarkMode;
+    }
+    applyDarkMode(isDarkMode);
+    updateDarkModeIcon(isDarkMode);
   } catch (error) {
     console.error('Error loading settings:', error);
   }
@@ -120,7 +130,7 @@ const saveSettings = async (): Promise<void> => {
   try {
     const settings: StoreSettings = {};
     
-    // Get current checkbox states
+    // Get current checkbox states for stores
     Object.keys(defaultSettings).forEach(store => {
       const storeKey = store as StoreKey;
       const enableCheckbox = document.getElementById(`enable${capitalizeFirst(storeKey)}`) as HTMLInputElement;
@@ -132,8 +142,20 @@ const saveSettings = async (): Promise<void> => {
       };
     });
     
-    await chrome.storage.sync.set({ storeSettings: settings });
-    console.log('Settings saved:', settings);
+    // Get dark mode state
+    const darkModeCheckbox = document.getElementById('darkModeToggle') as HTMLInputElement;
+    const isDarkMode = darkModeCheckbox ? darkModeCheckbox.checked : false;
+    
+    await chrome.storage.sync.set({ 
+      storeSettings: settings,
+      darkMode: isDarkMode
+    });
+    
+    // Apply dark mode immediately
+    applyDarkMode(isDarkMode);
+    updateDarkModeIcon(isDarkMode);
+    
+    console.log('Settings saved:', settings, 'Dark mode:', isDarkMode);
   } catch (error) {
     console.error('Error saving settings:', error);
   }
@@ -148,9 +170,14 @@ const capitalizeFirst = (str: string): string => {
 const initializeSettings = (): void => {
   const storeCheckboxes = document.querySelectorAll('.store-checkbox');
   const closeCheckboxes = document.querySelectorAll('.sub-checkbox');
+  const darkModeCheckbox = document.getElementById('darkModeToggle');
 
-  // Add change listeners to all checkboxes
-  Array.from(storeCheckboxes).concat(Array.from(closeCheckboxes)).forEach(checkbox => {
+  // Add change listeners to all checkboxes (store settings and dark mode)
+  const allCheckboxes = Array.from(storeCheckboxes)
+    .concat(Array.from(closeCheckboxes))
+    .concat(darkModeCheckbox ? [darkModeCheckbox] : []);
+    
+  allCheckboxes.forEach(checkbox => {
     checkbox.addEventListener('change', saveSettings);
   });
 };
@@ -172,3 +199,27 @@ searchButton?.addEventListener('mouseleave', (e) => {
   const target = e.target as HTMLElement;
   target.style.transform = 'translateY(0)';
 });
+
+// Dark mode helper functions
+const applyDarkMode = (isDarkMode: boolean): void => {
+  if (isDarkMode) {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.body.classList.remove('dark');
+  }
+};
+
+const updateDarkModeIcon = (isDarkMode: boolean): void => {
+  const sunIcon = document.querySelector('.sun-icon');
+  const moonIcon = document.querySelector('.moon-icon');
+  
+  if (isDarkMode) {
+    sunIcon?.classList.add('hidden');
+    moonIcon?.classList.remove('hidden');
+  } else {
+    sunIcon?.classList.remove('hidden');
+    moonIcon?.classList.add('hidden');
+  }
+};
